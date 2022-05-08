@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  webserver:
+    ports:
+      - "${DOCKER_HTTP_PORT}:80"
+      - "${DOCKER_HTTPS_PORT}:443"
+  app:
+    build:
+      args:
+        XDEBUG_HOST: ${XDEBUG_HOST}
+        XDEBUG_CONF: conf.d
+        ENV_STATE: ${DOCKER_ENV}
+  db:
+    ports:
+      - "${DOCKER_DB_EXTERNAL_PORT}:3306"
+  adminer:
+    container_name: "${DOCKER_PREFIX}_adminer"
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_DESIGN: "pepa-linha"
+      ADMINER_PLUGINS: "enum-types enum-option edit-calendar tables-filter dump-json"
+    ports:
+      - "${DOCKER_ADMINER_PORT}:8080"
+    networks:
+      - app-network
+  mailhog:
+    container_name: "${DOCKER_PREFIX}_mailhog"
+    image: mailhog/mailhog
+    restart: always
+    ports:
+      - "${DOCKER_MAILHOG_PORT_0}:1025"
+      - "${DOCKER_MAILHOG_PORT_1}:8025"
+    networks:
+      - app-network
